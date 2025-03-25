@@ -2,6 +2,7 @@ import NextAuth, { User } from "next-auth";
 import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import userLogIn from "@/libs/userLogin";
+import { useRouter } from "next/router";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -48,7 +49,11 @@ export const authOptions: AuthOptions = {
       session.user = token as any
       return session
     }
-  }
+  },
+  pages: {
+    signIn: "/login",
+    signOut: "/logout",
+  },
 }
 const handler = NextAuth(authOptions)
 export { handler as GET, handler as POST };

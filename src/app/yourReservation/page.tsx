@@ -2,7 +2,7 @@
 import { useAppSelector } from "@/redux/store"
 import { AppDispatch } from "@/redux/store"
 import { removeReservation } from "@/redux/features/cartSlice"
-import { useDispatch, UseDispatch } from "react-redux"
+import { useDispatch } from "react-redux"
 import React, { useEffect, useState } from "react"
 import { useSession } from "next-auth/react"
 import getUserProfile from '@/libs/getUserProfile';
@@ -13,33 +13,6 @@ export default function ReservationCart() {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [bookings, setBookings] = useState<any[]>([]);
-  const [editedBooking, setEditedBooking] = useState<any>(null);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editText, setEditText] = useState<string>("");
-
-  const handleCheckboxChange = (bookingId: string) => {
-    if (editedBooking === bookingId) {
-      setEditedBooking(null);
-      setIsEditing(false);
-      setEditText("");
-    } else {
-      setEditedBooking(bookingId);
-      setIsEditing(true);
-    }
-  };
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEditText(event.target.value);
-  };
-
-  const handleSave = () => {
-    if (editedBooking && editText) {
-      console.log(`Saving changes for booking ${editedBooking}: ${editText}`);
-      setIsEditing(false);
-      setEditedBooking(null);
-      setEditText(""); // ล้างข้อความหลังจากบันทึก
-    }
-  };
 
   useEffect(() => {
     if (!session?.user?.token) return;
@@ -65,7 +38,7 @@ export default function ReservationCart() {
   }, [session]);
 
   if (!session) {
-    return (<h1>Please login or Register</h1>);
+    return (<h1 className="text-center text-2xl font-serif mt-10">Please login or Register</h1>);
   }
 
   const getBooking = async () => {
@@ -125,73 +98,49 @@ export default function ReservationCart() {
   const userBookings = bookings.filter((bookingItem) => bookingItem.user === user?.data?._id);
 
   return (
-    <>
-      {user?.data && user?.data.role === 'admin' ? (
-        <>
-          <h1>ALL bookings</h1>
-          <ul>
-            {bookings.length === 0 ? (
-              <p>No bookings found.</p>
-            ) : (
-              bookings.map((bookingItem) => (
-                <div className="bg-slate-200 rounded px-5 mx-5 py-2 my-2" key={bookingItem._id}>
-                  <div className="text-xl">{bookingItem.user?.name}</div>
-                  <div className="text-l">Provider: {bookingItem.rentalCarProvider?.name}</div>
-                  <div className="text-sm">Pick-Up: {new Date(bookingItem.pickupDate).toLocaleDateString()}</div>
-                  <div className="text-sm">Drop-off: {new Date(bookingItem.dropoffDate).toLocaleDateString()}</div>
-                  <div className="text-md">
-                    Duration: {calculateDuration(bookingItem.pickupDate, bookingItem.dropoffDate)} days
-                  </div>
-                  <button
-                    className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-1 text-white shadow-sm"
-                    onClick={() => deleteBooking(bookingItem._id)}
-                  >
-                    Remove from Cart
-                  </button>
-                  <button
-                    className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-1 text-white shadow-sm"
-                    onClick={() => handleRedirect(bookingItem._id)}
-                  >
-                    Update this reservation
-                  </button>
+    <div className="container mx-auto max-w-4xl p-5">
+      <h1 className="text-center text-3xl font-bold font-serif text-black mb-6 leading-relaxed tracking-wider">
+        {user?.data && user?.data.role === 'admin' ? "All Bookings" : "Your Bookings"}
+      </h1>
+
+      <ul className="space-y-5">
+        {bookings.length === 0 ? (
+          <p className="text-center text-gray-500 text-lg leading-relaxed tracking-wider">No bookings found.</p>
+        ) : (
+          (user?.data.role === 'admin' ? bookings : userBookings).map((bookingItem) => (
+            <div key={bookingItem._id} className="bg-white shadow-lg rounded-lg border p-5 space-y-3 leading-relaxed tracking-wider">
+              {user?.data.role === 'admin' && (
+                <div className="text-lg font-semibold text-gray-700">
+                  User: <span className="font-bold leading-relaxed tracking-wider">{bookingItem.user?.name}</span>
                 </div>
-              ))
-            )}
-          </ul>
-        </>
-      ) : (
-        <>
-          <h1>Your bookings</h1>
-          <ul>
-            {userBookings.length === 0 ? (
-              <p>No bookings found.</p>
-            ) : (
-              userBookings.map((bookingItem) => (
-                <div className="bg-slate-200 rounded px-5 mx-5 py-2 my-2" key={bookingItem._id}>
-                  <div className="text-l">Provider: {bookingItem.rentalCarProvider?.name}</div>
-                  <div className="text-sm">Pick-Up: {new Date(bookingItem.pickupDate).toLocaleDateString()}</div>
-                  <div className="text-sm">Drop-off: {new Date(bookingItem.dropoffDate).toLocaleDateString()}</div>
-                  <div className="text-md">
-                    Duration: {calculateDuration(bookingItem.pickupDate, bookingItem.dropoffDate)} days
-                  </div>
-                  <button
-                    className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-1 text-white shadow-sm"
-                    onClick={() => deleteBooking(bookingItem._id)}
-                  >
-                    Remove from Cart
-                  </button>
-                  <button
-                    className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-1 text-white shadow-sm"
-                    onClick={() => handleRedirect(bookingItem._id)}
-                  >
-                    Update this reservation
-                  </button>
-                </div>
-              ))
-            )}
-          </ul>
-        </>
-      )}
-    </>
+              )}
+              <div className="text-lg font-semibold font-serif leading-relaxed tracking-wider">
+                Provider: <span className="text-indigo-700">{bookingItem.rentalCarProvider?.name}</span>
+              </div>
+              <div className="text-gray-600 font-serif leading-relaxed tracking-wider">Pick-Up: {new Date(bookingItem.pickupDate).toLocaleDateString()}</div>
+              <div className="text-gray-600 font-serif leading-relaxed tracking-wider">Drop-off: {new Date(bookingItem.dropoffDate).toLocaleDateString()}</div>
+              <div className="text-indigo-700 font-semibold font-serif">
+                Duration: {calculateDuration(bookingItem.pickupDate, bookingItem.dropoffDate)} days
+              </div>
+
+              <div className="flex space-x-3">
+                <button
+                  className="w-full h-12 text-lg opacity-90 bg-red-600 hover:bg-red-700 rounded-xl font-serif flex items-center justify-center relative group leading-relaxed tracking-wider text-white"
+                  onClick={() => deleteBooking(bookingItem._id)}
+                >
+                  Remove Booking
+                </button>
+                <button
+                  className="w-full h-12 text-lg opacity-90 hover:shadow-blue-800 hover:bg-blue-500 bg-blue-600 rounded-xl font-serif flex items-center justify-center relative group leading-relaxed tracking-wider text-white"
+                  onClick={() => handleRedirect(bookingItem._id)}
+                >
+                  Update Booking
+                </button>
+              </div>
+            </div>
+          ))
+        )}
+      </ul>
+    </div>
   );
 }

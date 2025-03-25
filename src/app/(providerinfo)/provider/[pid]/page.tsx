@@ -1,39 +1,40 @@
-import Image from "next/image"
 import getProvider from "@/libs/getProvider";
 import Link from "next/link";
+
 export default async function ProviderDetailPage({ params }: { params: { pid: string } }) {
+    const ProviderDetail = await getProvider(params.pid);
 
-  const ProviderDetail = await getProvider(params.pid)
+    return (
+        <main className="min-h-screen p-8 bg-gray-50 flex flex-col items-center font-serif">
+            {/* Header */}
+            <h1 className="text-2xl font-bold text-gray-800 mb-4">
+                {ProviderDetail.data.name}
+            </h1>
 
-  return (
-    <main className="text-center p-5">
-      <h1 className="text-lg font medium text-left">{ProviderDetail.data.name}</h1>
-      <div className="flex flex-row my-5">
-        {/* <Image src={ProviderDetail.data.picture}
-                    alt='Car Image'
-                    width={0} height={0} sizes="100vw"
-                    className="rounded-lg w-[30%] bg-black"/> */}
-        <div className="text-left">
-          <div className='text-md mx-5'>Address: {ProviderDetail.data.address}</div>
-          <div className='text-md mx-5'>District: {ProviderDetail.data.district}</div>
-          <div className='text-md mx-5'>Province: {ProviderDetail.data.province}</div>
-          <div className='text-md mx-5'>Postal Code: {ProviderDetail.data.postalcode}</div>
-          <div className='text-md mx-5'>Region: {ProviderDetail.data.region} </div>
-          <div className='text-md mx-5'>Tel: {ProviderDetail.data.tel}</div>
+            {/* รายละเอียดของผู้ให้บริการ */}
+            <div className="bg-white shadow-lg rounded-xl p-6 w-full max-w-2xl">
+                <div className="space-y-3 text-gray-700">
+                    <p className="text-lg"><span className="font-semibold">Address:</span> {ProviderDetail.data.address}</p>
+                    <p><span className="font-semibold">District:</span> {ProviderDetail.data.district}</p>
+                    <p><span className="font-semibold">Province:</span> {ProviderDetail.data.province}</p>
+                    <p><span className="font-semibold">Postal Code:</span> {ProviderDetail.data.postalcode}</p>
+                    <p><span className="font-semibold">Region:</span> {ProviderDetail.data.region}</p>
+                    <p><span className="font-semibold">Tel:</span> {ProviderDetail.data.tel}</p>
+                </div>
 
-          <Link href={`/reservations?id=${params.pid}&model=${ProviderDetail.data.name}`}>
-            <button className="block rounded-md bg-sky-600 hover:bg-indigo-600 px-3 py-1
-                        text-white shadow-sm">
-              Make Reservation
-            </button>
-          </Link>
-
-        </div>
-      </div>
-    </main>
-  );
+                {/* ปุ่มจองรถ */}
+                <div className="mt-6 flex justify-center">
+                    <Link href={`/reservation?id=${params.pid}&model=${ProviderDetail.data.name}`}>
+                        <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg shadow-md transition duration-300">
+                            Make Reservation
+                        </button>
+                    </Link>
+                </div>
+            </div>
+        </main>
+    );
 }
 
 export async function generateStaticParams() {
-  return [{ cid: '001' }, { cid: '002' }, { cid: '003' }, { cid: '004' }]
+    return [{ cid: '001' }, { cid: '002' }, { cid: '003' }, { cid: '004' }];
 }
