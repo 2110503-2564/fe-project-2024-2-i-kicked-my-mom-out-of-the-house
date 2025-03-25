@@ -3,41 +3,44 @@ import { useEffect, useRef } from "react"
 import { useState } from "react"
 import { useWindowListener } from "@/hooks/useWindowListener"
 
-export function VlogPlayer({vdoSrc, isPlaying}: {vdoSrc:string, isPlaying:boolean}){
-
+export function VlogPlayer({
+    vdoSrc,
+    isPlaying,
+    className
+}: {
+    vdoSrc: string,
+    isPlaying: boolean,
+    className?: string
+}) {
     const vdoRef = useRef<HTMLVideoElement>(null)
 
-    useWindowListener("resize", (e)=>{alert('Window Width is ' 
-        + (e.target as Window).innerWidth)});
+    useWindowListener("resize", (e) => {
+        alert('Window Width is ' + (e.target as Window).innerWidth)
+    });
 
-    useEffect(()=> {
-         //alert('width is ' + vdoRef.current?.videoWidth)
-        if(isPlaying){
-        //alert('Play VDO')
-        vdoRef.current?.play()
-        }
-        else{
-        //alert('Pause VDO')
-        vdoRef.current?.pause()
+    useEffect(() => {
+        if (isPlaying) {
+            vdoRef.current?.play()
+        } else {
+            vdoRef.current?.pause()
         }
     }, [isPlaying])
-   
+
     const [winwidth, setWinwidth] = useState(0)
-    useEffect(()=>{
-        const handleWinWidthChange = ()=>{
+    useEffect(() => {
+        const handleWinWidthChange = () => {
             setWinwidth(window.innerWidth);
             alert('window width' + window.innerWidth)
         }
 
         window.addEventListener("resize", handleWinWidthChange)
 
-        return ()=>{
+        return () => {
             window.removeEventListener("resize", handleWinWidthChange)
         }
-    },[])
+    }, [])
 
-    return(
-        <video className='w-[40%]' src={vdoSrc} ref={vdoRef} muted loop controls/>
+    return (
+        <video className={`w-[40%] ${className}`} src={vdoSrc} ref={vdoRef} muted loop controls />
     )
-
 }
