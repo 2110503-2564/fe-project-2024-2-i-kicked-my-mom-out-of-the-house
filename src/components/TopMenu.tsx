@@ -4,7 +4,7 @@ import TopMenuItem from './TopMenuItem';
 import { useSession, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import getUserProfile from '@/libs/getUserProfile';
 
 export default async function TopMenu() {

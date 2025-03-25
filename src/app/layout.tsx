@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import TopMenu from "@/components/TopMenu";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "./api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/authOptions";
 import NextAuthProvider from "@/providers/NextAuthProvider";
 import ReduxProvider from "@/redux/ReduxProvider";
 
